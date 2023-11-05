@@ -3,7 +3,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 # Assume text is a string containing your text data
-text = "The capital of france is paris"
+text = "The capital of france is paris. Most of the people in paris like chicken."
 
 # Split the text into segments (e.g., paragraphs)
 segments = text.split('\n')
@@ -12,11 +12,16 @@ segments = text.split('\n')
 vectorizer = TfidfVectorizer()
 tfidf_matrix = vectorizer.fit_transform(segments)
 
-def semantic_search(query):
+def semantic_search(query, threshold=0.2):
     query_vector = vectorizer.transform([query])
     cosine_sim = cosine_similarity(query_vector, tfidf_matrix)
     best_match_index = np.argmax(cosine_sim[0])
-    return segments[best_match_index]
+    best_match_score = cosine_sim[0][best_match_index]
+
+    if best_match_score >= threshold:
+        return segments[best_match_index]
+    else:
+        return "I'm sorry, I couldn't find a good match for your query."
 
 def chatbot():
     while True:
